@@ -1,0 +1,586 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A Letter For You</title>
+<meta name="description" content="I wrote you something.">
+<meta property="og:title" content="I wrote you something 🤍">
+<meta property="og:description" content="It's just a letter. Open it whenever you're ready.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✉️</text></svg>">
+<style>
+  /* Caveat by Impallari Type, SIL Open Font License — self-hosted so this page loads nothing from anywhere else */
+  @font-face{font-family:'Caveat';src:url('fonts/caveat.woff2') format('woff2');font-weight:400 700;font-display:swap}
+
+  :root{
+    --sky-1:#231b36; --sky-2:#4b3760; --sky-3:#a8667e; --sky-4:#f0a99a;
+    --paper:#fffaf1; --ink:#3b2b3f; --ink-soft:#7a6680; --rose:#e2577f; --rose-soft:#ffd3df;
+    --hand:'Caveat','Segoe Print','Bradley Hand',cursive;
+    --ui:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:var(--ui);color:var(--ink);
+    background:linear-gradient(180deg,var(--sky-1) 0%,var(--sky-2) 45%,var(--sky-3) 80%,var(--sky-4) 100%);
+    min-height:100dvh;overflow-x:hidden;-webkit-tap-highlight-color:transparent;
+  }
+
+  /* fireflies */
+  .sky{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0}
+  .sky i{position:absolute;width:var(--d);height:var(--d);border-radius:50%;background:#fff6c8;
+    box-shadow:0 0 calc(var(--d)*3) calc(var(--d)*.8) rgba(255,236,150,.55);
+    animation:drift var(--t) ease-in-out infinite alternate, glow calc(var(--t)/3) ease-in-out infinite alternate;opacity:.2}
+  @keyframes drift{to{transform:translate(var(--x),var(--y))}}
+  @keyframes glow{to{opacity:.95}}
+
+  .stage{position:relative;z-index:1;min-height:100dvh;display:grid;place-items:center;padding:28px 16px 64px}
+  .scene{width:min(460px,100%);display:none;flex-direction:column;align-items:center;text-align:center}
+  .scene.on{display:flex;animation:enter .9s cubic-bezier(.2,.9,.3,1) both}
+  .scene.out{animation:leave .5s ease-in forwards}
+  @keyframes enter{from{opacity:0;transform:translateY(24px) scale(.97);filter:blur(4px)}to{opacity:1;transform:none;filter:none}}
+  @keyframes leave{to{opacity:0;transform:translateY(-18px) scale(.97);filter:blur(4px)}}
+
+  .eyebrow{font-family:var(--hand);font-size:1.6rem;color:#ffe7ee;opacity:.9;margin-bottom:18px}
+  .hint{margin-top:22px;font-size:.85rem;color:#ffe7ee;opacity:.7;letter-spacing:.04em}
+  .hint.pulse{animation:hintp 2s ease-in-out infinite}
+  @keyframes hintp{50%{opacity:.35}}
+
+  /* ---------- scene 1: envelope ---------- */
+  .env-wrap{position:relative;width:min(320px,86vw);aspect-ratio:3/2;cursor:pointer;margin-top:84px;
+    animation:float 3.4s ease-in-out infinite;filter:drop-shadow(0 22px 30px rgba(20,8,30,.45))}
+  @keyframes float{50%{transform:translateY(-10px) rotate(-1deg)}}
+  .env-wrap:focus-visible{outline:3px dashed #ffe7ee;outline-offset:10px;border-radius:12px}
+  .env-back{position:absolute;inset:0;background:#f3d9c9;border-radius:10px}
+  .env-letter{position:absolute;left:7%;right:7%;top:8%;bottom:8%;background:var(--paper);border-radius:6px;
+    transition:transform 1s cubic-bezier(.3,1.2,.4,1) .5s}
+  .env-front{position:absolute;inset:0;border-radius:10px;overflow:hidden;pointer-events:none}
+  .env-front svg{width:100%;height:100%;display:block}
+  .env-flap{position:absolute;left:0;right:0;top:0;height:58%;transform-origin:50% 0;transition:transform .7s cubic-bezier(.5,0,.3,1);z-index:3}
+  .env-flap svg{width:100%;height:100%;display:block;overflow:visible}
+  .seal{position:absolute;left:50%;top:58%;width:54px;height:54px;margin:-27px 0 0 -27px;z-index:4;
+    border-radius:50%;background:radial-gradient(circle at 35% 30%,#f07a9a,#b8304f 70%);
+    box-shadow:inset 0 -3px 6px rgba(0,0,0,.25),0 3px 8px rgba(80,10,30,.4);
+    display:grid;place-items:center;color:#ffe2ea;font-size:22px;transition:transform .45s,opacity .45s}
+  .to{position:absolute;left:0;right:0;bottom:12%;z-index:4;font-family:var(--hand);font-size:1.7rem;color:#8a4a5e;pointer-events:none;transition:opacity .3s}
+  .env-wrap.open{animation:none}
+  .env-wrap.open .seal{transform:scale(1.4) rotate(25deg);opacity:0}
+  .env-wrap.open .to{opacity:0}
+  .env-wrap.open .env-flap{transform:rotateX(180deg);z-index:0}
+  .env-wrap.open .env-letter{transform:translateY(-62%)}
+
+  /* the sorry bear peeking over the envelope */
+  .peek{position:absolute;left:50%;bottom:92%;width:110px;margin-left:-55px;z-index:-1;
+    animation:peek 5s ease-in-out infinite}
+  @keyframes peek{0%,100%{transform:translateY(38px)}18%,70%{transform:translateY(0)}}
+  .peek .sign{animation:signwob 2.5s ease-in-out infinite;transform-origin:100px 40px;transform-box:view-box}
+  @keyframes signwob{50%{transform:rotate(4deg)}}
+
+  /* ---------- scene 2: the letter ---------- */
+  .paper{position:relative;width:100%;background:var(--paper);border-radius:6px;padding:34px 26px 30px;text-align:left;
+    box-shadow:0 30px 60px rgba(20,8,30,.45);
+    background-image:repeating-linear-gradient(180deg,transparent 0 33px,rgba(120,150,200,.18) 33px 34px);
+    background-position:0 34px;cursor:pointer}
+  .paper::before{content:'';position:absolute;left:18px;top:0;bottom:0;width:1px;background:rgba(226,87,127,.25)}
+  .paper::after{content:'';position:absolute;top:-12px;left:50%;width:90px;height:26px;margin-left:-45px;
+    background:rgba(255,211,223,.75);transform:rotate(-3deg);box-shadow:0 2px 4px rgba(0,0,0,.08)}
+  .letter{font-family:var(--hand);font-size:1.55rem;line-height:34px;color:var(--ink);min-height:200px}
+  .letter p{min-height:34px}
+  .letter p + p:not(.sig){text-indent:1.4em}
+  .letter p.sig{text-align:right;margin-top:6px}
+  .caret{display:inline-block;width:2px;height:1.1em;background:var(--rose);vertical-align:-3px;margin-left:2px;animation:caret .8s steps(1) infinite}
+  @keyframes caret{50%{opacity:0}}
+  .skip{position:absolute;right:12px;bottom:8px;font-size:.72rem;color:var(--ink-soft);opacity:.7}
+
+  .btn{font-family:var(--ui);font-weight:600;font-size:1rem;border:0;cursor:pointer;border-radius:999px;padding:13px 26px;
+    background:#fff;color:var(--ink);box-shadow:0 8px 22px rgba(20,8,30,.3);transition:transform .25s cubic-bezier(.3,1.6,.5,1),box-shadow .2s,opacity .4s;
+    touch-action:manipulation}
+  .btn:hover{transform:translateY(-2px)}
+  .btn:active{transform:scale(.96)}
+  .btn:focus-visible{outline:3px solid #ffe7ee;outline-offset:3px}
+  .btn.ghost{background:rgba(255,255,255,.14);color:#fff;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.5)}
+  .next{margin-top:26px;opacity:0;pointer-events:none}
+  .next.show{opacity:1;pointer-events:auto;animation:enter .6s both}
+
+  /* ---------- scene 3: promise notes ---------- */
+  .title{font-family:var(--hand);font-size:2.3rem;color:#fff;line-height:1.1;margin-bottom:6px}
+  .lead{color:#ffe7ee;opacity:.85;font-size:.95rem;margin-bottom:22px}
+  .notes{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;width:100%}
+  .note{perspective:800px;height:132px;cursor:pointer;border:0;background:none;font:inherit;padding:0}
+  .note:nth-child(5){grid-column:1 / -1;justify-self:center;width:calc(50% - 7px)}
+  .note .in{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .7s cubic-bezier(.3,1.3,.5,1)}
+  .note.flipped .in{transform:rotateY(180deg)}
+  .note .f,.note .b{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:4px;
+    display:grid;place-items:center;padding:12px;box-shadow:0 10px 20px rgba(20,8,30,.3)}
+  .note .f{background:var(--c);font-size:2.2rem}
+  .note .f small{display:block;font-family:var(--hand);font-size:1.15rem;color:rgba(59,43,63,.65);margin-top:2px}
+  .note .f::after{content:'';position:absolute;right:0;bottom:0;border:14px solid transparent;border-right-color:rgba(0,0,0,.07);border-bottom-color:rgba(0,0,0,.07)}
+  .note .b{background:var(--paper);transform:rotateY(180deg);font-family:var(--hand);font-size:1.3rem;line-height:1.15;color:var(--ink)}
+  .note:nth-child(odd) .in{rotate:-2deg}
+  .note:nth-child(even) .in{rotate:2deg}
+  .note:focus-visible{outline:3px dashed #ffe7ee;outline-offset:4px;border-radius:6px}
+  .count{margin-top:16px;font-size:.85rem;color:#ffe7ee;opacity:.75}
+
+  /* ---------- scene 4: the flower ---------- */
+  .garden{position:relative;width:min(300px,80vw);height:330px;margin:4px auto 0}
+  .garden svg.plant{position:absolute;left:0;bottom:0;width:100%;height:100%;overflow:visible}
+  .can{position:absolute;right:-14px;top:6px;width:110px;transform-origin:30% 70%;transition:transform .45s cubic-bezier(.3,1.4,.5,1);pointer-events:none}
+  .garden.watering .can{transform:rotate(-32deg) translate(-12px,8px)}
+  .drop{position:absolute;width:7px;height:11px;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;background:#8fd3ff;
+    pointer-events:none;animation:dropfall .75s ease-in forwards;opacity:.9}
+  @keyframes dropfall{to{transform:translate(var(--dx),var(--dy));opacity:0}}
+  .spark{position:absolute;pointer-events:none;font-size:var(--s);animation:spark 1.4s ease-out forwards}
+  @keyframes spark{0%{transform:translate(-50%,-50%) scale(.2);opacity:1}100%{transform:translate(calc(-50% + var(--x)),calc(-50% + var(--y))) scale(1);opacity:0}}
+  .meter{width:min(240px,70vw);height:8px;border-radius:99px;background:rgba(255,255,255,.2);overflow:hidden;margin:14px auto 0}
+  .meter b{display:block;height:100%;width:0;background:linear-gradient(90deg,#8fd3ff,#ff9fbd);border-radius:inherit;transition:width .15s linear}
+  .hold{margin-top:18px;user-select:none;-webkit-user-select:none;touch-action:none}
+  .hold.active{transform:scale(.95);box-shadow:0 0 0 6px rgba(143,211,255,.35),0 8px 22px rgba(20,8,30,.3)}
+  .bloomed .hold{display:none}
+
+  /* ---------- scene 5: her choice ---------- */
+  .choices{display:flex;flex-direction:column;gap:12px;width:min(300px,100%);margin-top:6px}
+  .reply{display:none;margin-top:8px}
+  .reply.on{display:block;animation:enter .8s both}
+  .reply .paper{cursor:default;text-align:center;padding:30px 22px 26px}
+  .reply .paper{background-image:none}
+  .reply .paper::before{display:none}
+  .reply .letter{min-height:0;font-size:1.65rem}
+  .reply .letter p{text-indent:0!important}
+  .big-emoji{font-size:3.4rem;margin-bottom:6px;display:inline-block;animation:float 3s ease-in-out infinite}
+  .petal{position:fixed;top:-30px;pointer-events:none;z-index:3;animation:petal linear forwards}
+  @keyframes petal{to{transform:translate(var(--sway),110vh) rotate(var(--rot))}}
+
+  .privacy{position:fixed;left:0;right:0;bottom:0;z-index:2;text-align:center;padding:10px 16px 14px;font-size:.75rem;color:#fff;opacity:.7;
+    background:linear-gradient(transparent,rgba(35,27,54,.35))}
+
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+  }
+  @media (max-width:360px){ .letter{font-size:1.4rem} .note{height:120px} }
+</style>
+</head>
+<body>
+  <div class="sky" id="sky" aria-hidden="true"></div>
+
+  <main class="stage">
+
+    <!-- 1 · envelope -->
+    <section class="scene on" id="s-env">
+      <p class="eyebrow">I wrote you something…</p>
+      <div class="env-wrap" id="env" role="button" tabindex="0" aria-label="Open the letter">
+        <svg class="peek" viewBox="0 0 200 150" aria-hidden="true">
+          <g class="sign">
+            <line x1="160" y1="40" x2="150" y2="140" stroke="#a0714f" stroke-width="5" stroke-linecap="round"/>
+            <rect x="122" y="10" width="72" height="40" rx="6" fill="#fffaf1" stroke="#e2577f" stroke-width="2.5"/>
+            <text x="158" y="38" text-anchor="middle" font-family="Caveat, cursive" font-size="24" font-weight="700" fill="#e2577f">sorry</text>
+          </g>
+          <circle cx="58" cy="52" r="20" fill="#c98b5e"/><circle cx="58" cy="52" r="11" fill="#f2c4a0"/>
+          <circle cx="132" cy="52" r="20" fill="#c98b5e"/><circle cx="132" cy="52" r="11" fill="#f2c4a0"/>
+          <circle cx="95" cy="100" r="58" fill="#d9a073"/>
+          <ellipse cx="95" cy="122" rx="26" ry="19" fill="#f5d6b8"/>
+          <path d="M66 78 L84 72 M124 78 L106 72" stroke="#3a2318" stroke-width="4" stroke-linecap="round"/>
+          <ellipse cx="76" cy="95" rx="6.5" ry="7.5" fill="#3a2318"/><ellipse cx="114" cy="95" rx="6.5" ry="7.5" fill="#3a2318"/>
+          <circle cx="78" cy="92" r="2.4" fill="#fff"/><circle cx="116" cy="92" r="2.4" fill="#fff"/>
+          <ellipse cx="62" cy="113" rx="9" ry="5.5" fill="#ff8fab" opacity=".7"/><ellipse cx="128" cy="113" rx="9" ry="5.5" fill="#ff8fab" opacity=".7"/>
+          <ellipse cx="95" cy="112" rx="8" ry="5.5" fill="#4a2c20"/>
+          <path d="M86 128 Q95 122 104 128" stroke="#4a2c20" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+          <!-- paws holding the edge -->
+          <ellipse cx="62" cy="148" rx="14" ry="10" fill="#c98b5e"/><ellipse cx="128" cy="148" rx="14" ry="10" fill="#c98b5e"/>
+        </svg>
+        <div class="env-back"></div>
+        <div class="env-letter"></div>
+        <div class="env-front">
+          <svg viewBox="0 0 300 200" preserveAspectRatio="none" aria-hidden="true">
+            <path d="M0 0 L150 112 L300 0 L300 200 L0 200Z" fill="#f8e6da"/>
+            <path d="M0 200 L135 100 M300 200 L165 100" stroke="#e9cdbc" stroke-width="2"/>
+          </svg>
+        </div>
+        <div class="env-flap">
+          <svg viewBox="0 0 300 116" preserveAspectRatio="none" aria-hidden="true">
+            <path d="M0 0 L300 0 L150 116Z" fill="#eecbb8"/>
+          </svg>
+        </div>
+        <div class="seal" aria-hidden="true">♥</div>
+        <div class="to" id="toName">for you</div>
+      </div>
+      <p class="hint pulse">tap the envelope</p>
+    </section>
+
+    <!-- 2 · the letter -->
+    <section class="scene" id="s-letter">
+      <div class="paper" id="paper" title="Tap to show it all">
+        <div class="letter" id="letter" aria-live="polite"></div>
+        <span class="skip" id="skip">tap to skip ahead</span>
+      </div>
+      <button class="btn next" id="toNotes">There's more →</button>
+    </section>
+
+    <!-- 3 · promise notes -->
+    <section class="scene" id="s-notes">
+      <h2 class="title">What you can always count on</h2>
+      <p class="lead">Nothing new. Just things you should never have to wonder about.</p>
+      <div class="notes" id="notes"></div>
+      <p class="count" id="count">0 of 5 opened</p>
+      <button class="btn next" id="toFlower">One last thing →</button>
+    </section>
+
+    <!-- 4 · the wilted flower -->
+    <section class="scene" id="s-flower">
+      <h2 class="title" id="flowerTitle">This little guy is how I feel</h2>
+      <p class="lead" id="flowerLead">You don't owe me anything. But if you want, you can water it.</p>
+      <div class="garden" id="garden">
+        <svg class="plant" viewBox="0 0 200 260" aria-hidden="true">
+          <defs>
+            <linearGradient id="potG" x1="0" x2="1"><stop offset="0" stop-color="#c8664d"/><stop offset="1" stop-color="#a24f3c"/></linearGradient>
+          </defs>
+          <ellipse cx="100" cy="252" rx="62" ry="7" fill="rgba(20,8,30,.3)"/>
+          <g id="plantLive">
+            <path id="stem" d="M100 205 Q100 130 140 150" stroke="#6aa84f" stroke-width="6" fill="none" stroke-linecap="round"/>
+            <path id="leafL" d="M100 180 Q72 168 62 182 Q80 196 100 186Z" fill="#7cbf5c"/>
+            <path id="leafR" d="M100 168 Q128 154 140 166 Q120 182 100 174Z" fill="#7cbf5c"/>
+            <g id="head" transform="translate(140 150) rotate(130)">
+              <g id="petals"></g>
+              <circle r="9" fill="#ffd36e"/>
+              <circle r="9" fill="url(#potG)" opacity="0" id="centerShade"/>
+            </g>
+          </g>
+          <path d="M52 200 L148 200 L138 252 L62 252Z" fill="url(#potG)"/>
+          <rect x="46" y="194" width="108" height="16" rx="4" fill="#d27458"/>
+          <path d="M66 226 q8 -6 16 0 M118 226 q8 -6 16 0" stroke="#7a3a2c" stroke-width="2.5" fill="none" stroke-linecap="round" id="potFace"/>
+          <path d="M92 238 q8 -6 16 0" stroke="#7a3a2c" stroke-width="2.5" fill="none" stroke-linecap="round" id="potMouth"/>
+        </svg>
+        <svg class="can" viewBox="0 0 120 90" aria-hidden="true">
+          <path d="M28 30 Q20 4 50 6 Q78 8 70 30" stroke="#7fa7c9" stroke-width="6" fill="none"/>
+          <rect x="20" y="28" width="62" height="50" rx="10" fill="#9ec5e6"/>
+          <rect x="20" y="40" width="62" height="8" fill="#b9d7ef"/>
+          <path d="M22 62 L2 76" stroke="#9ec5e6" stroke-width="8" stroke-linecap="round"/>
+          <ellipse cx="2" cy="77" rx="6" ry="4" fill="#7fa7c9" transform="rotate(-35 2 77)"/>
+        </svg>
+      </div>
+      <div class="meter" aria-hidden="true"><b id="meter"></b></div>
+      <button class="btn hold" id="hold">💧 Press and hold to water</button>
+      <button class="btn next" id="toChoice">Continue →</button>
+    </section>
+
+    <!-- 5 · her choice, zero pressure -->
+    <section class="scene" id="s-choice">
+      <div id="choiceAsk" style="display:flex;flex-direction:column;align-items:center">
+        <h2 class="title">Whatever you feel is okay</h2>
+        <p class="lead">Every option here is a good answer. Nothing gets sent to me. It's just for you.</p>
+        <div class="choices">
+          <button class="btn" data-reply="forgive">I forgive you 🌷</button>
+          <button class="btn" data-reply="time">I need some time 🌙</button>
+          <button class="btn" data-reply="talk">Let's talk about it 💬</button>
+          <button class="btn ghost" data-reply="reread">Read the letter again ✉️</button>
+        </div>
+      </div>
+      <div class="reply" id="reply">
+        <div class="paper">
+          <div class="big-emoji" id="replyEmoji"></div>
+          <div class="letter" id="replyText"></div>
+        </div>
+        <button class="btn ghost next show" id="back" style="margin-top:20px">← back</button>
+      </div>
+    </section>
+  </main>
+
+  <p class="privacy">🔒 This page doesn't track anything. No analytics, no notifications, nothing is sent anywhere. It's just a letter.</p>
+
+<script>
+(() => {
+  /* =====================================================================
+     ✏️  EDIT YOUR WORDS HERE. Make them yours: specific beats pretty.
+     Link format: yoursite.vercel.app/?name=Her+Name&from=Your+Name
+     ===================================================================== */
+  const LETTER = [
+    'Hey {name},',
+    "About earlier. I owe you a real apology, not just a cute bear.",
+    "I made you something to make you smile, and I didn't tell you it was sending me notes about what you did on it. That wasn't fair to you. A sweet gesture shouldn't come with a hidden part.",
+    "I'm sorry. Not \"sorry if\", not \"sorry but\". Just sorry.",
+    "Because that isn't how I see us. Being close to you has never meant I get more of you than you choose to share. Your time, your space, your answers, your privacy: all of it is yours, and it always has been.",
+    "I'd always rather ask than assume. Anything you share with me should be something you chose to give, never something I took.",
+    "This page doesn't track a thing. It's just me saying sorry, and meaning it.",
+  ];
+  const SIGN = '— {from}';
+  const PROMISES = [
+    ['👂', 'I listen to understand, not just to reply.',        '#ffe28a'],
+    ['🚪', 'Your "no" is always respected. The first time.',    '#ffc2d6'],
+    ['🔍', "Nothing hidden from you. Earlier was a slip, not who I am.", '#bfe3ff'],
+    ['🐢', 'Your pace. Always.',                                 '#c9f2c7'],
+    ['🪞', 'When I mess up, I own it. Like right now.',          '#e3d2ff'],
+  ];
+  const REPLIES = {
+    forgive: ['🌷', "Thank you. Really.\nI won't waste it.\nI'll show you, not just tell you. 🤍"],
+    time:    ['🌙', "Take all the time you need.\nNo follow-ups, no guilt trips.\nI'll be right here whenever you're ready. 🤍"],
+    talk:    ['☕', "I'd like that.\nMessage me whenever you're ready.\nThis time I'll listen first. 🤍"],
+  };
+  /* ===================================================================== */
+
+  const params = new URLSearchParams(location.search);
+  const name = (params.get('name') || '').trim().slice(0, 30) || 'you';
+  const from = (params.get('from') || '').trim().slice(0, 30) || 'me';
+  const fill = s => s.replace('{name}', name).replace('{from}', from);
+  if (params.get('name')) document.getElementById('toName').textContent = 'for ' + name;
+
+  const $ = id => document.getElementById(id);
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* fireflies */
+  const sky = $('sky');
+  for (let i = 0; i < 26; i++) {
+    const f = document.createElement('i');
+    f.style.left = Math.random() * 100 + 'vw';
+    f.style.top = Math.random() * 100 + 'vh';
+    f.style.setProperty('--d', (2 + Math.random() * 3).toFixed(1) + 'px');
+    f.style.setProperty('--t', (6 + Math.random() * 8).toFixed(1) + 's');
+    f.style.setProperty('--x', (Math.random() * 120 - 60).toFixed(0) + 'px');
+    f.style.setProperty('--y', (Math.random() * 120 - 60).toFixed(0) + 'px');
+    f.style.animationDelay = -Math.random() * 10 + 's';
+    sky.appendChild(f);
+  }
+
+  /* soft sounds, made in code (paper rustle + little chimes) */
+  let ac = null;
+  const audio = () => {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return null;
+    if (!ac) ac = new AC();
+    if (ac.state === 'suspended') ac.resume();
+    return ac;
+  };
+  function chime(notes, gap = 0.12, vol = 0.18) {
+    const c = audio(); if (!c) return;
+    notes.forEach((m, i) => {
+      const t = c.currentTime + i * gap, f = 440 * Math.pow(2, (m - 69) / 12);
+      const o = c.createOscillator(), o2 = c.createOscillator(), g = c.createGain();
+      o.type = 'sine'; o.frequency.value = f; o2.type = 'sine'; o2.frequency.value = f * 3;
+      const g2 = c.createGain(); g2.gain.value = 0.08;
+      o.connect(g); o2.connect(g2); g2.connect(g); g.connect(c.destination);
+      g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + 0.01); g.gain.exponentialRampToValueAtTime(0.001, t + 1.6);
+      o.start(t); o2.start(t); o.stop(t + 1.7); o2.stop(t + 1.7);
+    });
+  }
+  function rustle() {
+    const c = audio(); if (!c) return;
+    const len = c.sampleRate * 0.5, buf = c.createBuffer(1, len, c.sampleRate), d = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2) * (0.5 + 0.5 * Math.sin(i / 900));
+    const s = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain();
+    f.type = 'highpass'; f.frequency.value = 1800; g.gain.value = 0.12;
+    s.buffer = buf; s.connect(f); f.connect(g); g.connect(c.destination); s.start();
+  }
+
+  function go(fromId, toId) {
+    const a = $(fromId), b = $(toId);
+    a.classList.add('out');
+    setTimeout(() => {
+      a.classList.remove('on', 'out');
+      b.classList.add('on');
+      window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+    }, reduce ? 0 : 480);
+  }
+
+  /* 1 · envelope */
+  const env = $('env');
+  let opened = false;
+  function openEnv() {
+    if (opened) return; opened = true;
+    env.classList.add('open'); rustle(); chime([72, 76, 79], 0.1, 0.12);
+    setTimeout(() => { go('s-env', 's-letter'); setTimeout(typeLetter, 700); }, reduce ? 200 : 1500);
+  }
+  env.addEventListener('click', openEnv);
+  env.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openEnv(); } });
+
+  /* 2 · handwritten letter, typed out */
+  const letterEl = $('letter');
+  const lines = [...LETTER.map(fill), fill(SIGN)];
+  let skip = false, typing = false;
+  async function typeLetter() {
+    if (typing) return; typing = true;
+    letterEl.innerHTML = '';
+    const caret = document.createElement('span'); caret.className = 'caret';
+    for (let i = 0; i < lines.length; i++) {
+      const p = document.createElement('p');
+      if (i === lines.length - 1) p.className = 'sig';
+      letterEl.appendChild(p);
+      if (skip || reduce) { p.textContent = lines[i]; continue; }
+      p.appendChild(caret);
+      for (const ch of lines[i]) {
+        if (skip) break;
+        caret.before(ch);
+        await wait(ch === '.' || ch === ',' ? 160 : ch === ' ' ? 30 : 34);
+      }
+      if (skip) { p.textContent = lines[i]; continue; }
+      caret.remove();
+      await wait(420);
+    }
+    caret.remove();
+    $('skip').style.display = 'none';
+    $('toNotes').classList.add('show');
+  }
+  const wait = ms => new Promise(r => setTimeout(r, ms));
+  $('paper').addEventListener('click', () => { skip = true; });
+  $('toNotes').addEventListener('click', () => { rustle(); go('s-letter', 's-notes'); });
+
+  /* 3 · promise notes */
+  const notesEl = $('notes');
+  let flipped = 0;
+  PROMISES.forEach(([emoji, text, color], i) => {
+    const n = document.createElement('button');
+    n.className = 'note';
+    n.setAttribute('aria-label', 'Open note ' + (i + 1));
+    n.innerHTML = `<div class="in"><div class="f" style="--c:${color}"><div>${emoji}<small>open me</small></div></div><div class="b"></div></div>`;
+    n.querySelector('.b').textContent = text;
+    n.addEventListener('click', () => {
+      if (n.classList.contains('flipped')) return;
+      n.classList.add('flipped');
+      n.setAttribute('aria-label', text);
+      rustle(); chime([67 + flipped * 2], 0, 0.12);
+      flipped++;
+      $('count').textContent = flipped === PROMISES.length ? "That's me. Always has been." : `${flipped} of ${PROMISES.length} opened`;
+      if (flipped === PROMISES.length) $('toFlower').classList.add('show');
+    });
+    notesEl.appendChild(n);
+  });
+  $('toFlower').addEventListener('click', () => go('s-notes', 's-flower'));
+
+  /* 4 · wilted flower she can bring back */
+  const garden = $('garden'), stem = $('stem'), head = $('head'), petalsG = $('petals');
+  const leafL = $('leafL'), leafR = $('leafR'), live = $('plantLive');
+  const NS = 'http://www.w3.org/2000/svg';
+  const petalEls = [];
+  for (let i = 0; i < 7; i++) {
+    const e = document.createElementNS(NS, 'ellipse');
+    e.setAttribute('rx', 9); e.setAttribute('ry', 19); e.setAttribute('fill', i % 2 ? '#ff8fb0' : '#ff6f99');
+    petalsG.appendChild(e); petalEls.push(e);
+  }
+  const lerp = (a, b, t) => a + (b - a) * t;
+  const ease = t => 1 - Math.pow(1 - t, 3);
+  let progress = 0;
+  function drawPlant(p) {
+    const t = ease(p);
+    const cx = lerp(100, 100, t), cy = lerp(130, 140, t), ex = lerp(140, 100, t), ey = lerp(150, 70, t);
+    stem.setAttribute('d', `M100 205 Q${cx} ${cy} ${ex} ${ey}`);
+    head.setAttribute('transform', `translate(${ex} ${ey}) rotate(${lerp(130, 0, t)}) scale(${lerp(.75, 1.15, t)})`);
+    petalEls.forEach((e, i) => {
+      const a = (360 / petalEls.length) * i;
+      const spread = lerp(4, 17, t);
+      e.setAttribute('transform', `rotate(${a + lerp(0, 8, t)}) translate(0 ${-spread})`);
+      e.setAttribute('ry', lerp(12, 19, t));
+    });
+    leafL.setAttribute('transform', `rotate(${lerp(28, -6, t)} 100 184)`);
+    leafR.setAttribute('transform', `rotate(${lerp(-26, 6, t)} 100 172)`);
+    live.style.filter = `grayscale(${(1 - t).toFixed(2)}) brightness(${lerp(.82, 1.05, t).toFixed(2)})`;
+    // the pot cheers up too
+    $('potFace').setAttribute('d', t > .6 ? 'M66 222 q8 6 16 0 M118 222 q8 6 16 0' : 'M66 226 q8 -6 16 0 M118 226 q8 -6 16 0');
+    $('potMouth').setAttribute('d', `M92 236 q8 ${lerp(-6, 9, t).toFixed(1)} 16 0`);
+    $('meter').style.width = (p * 100).toFixed(1) + '%';
+  }
+  drawPlant(0);
+
+  let holding = false, last = 0, dropTimer = 0, bloomed = false, lastNote = 0;
+  const hold = $('hold');
+  function startHold(e) {
+    if (bloomed) return;
+    e.preventDefault();
+    audio();
+    holding = true; last = performance.now();
+    hold.classList.add('active'); garden.classList.add('watering');
+    requestAnimationFrame(tick);
+  }
+  function stopHold() {
+    holding = false;
+    hold.classList.remove('active'); garden.classList.remove('watering');
+  }
+  function drop() {
+    const g = garden.getBoundingClientRect();
+    const d = document.createElement('span');
+    d.className = 'drop';
+    d.style.left = (g.width - 70 + Math.random() * 10) + 'px';
+    d.style.top = (78 + Math.random() * 6) + 'px';
+    d.style.setProperty('--dx', -(55 + Math.random() * 35) + 'px');
+    d.style.setProperty('--dy', (g.height - 170 + Math.random() * 20) + 'px');
+    garden.appendChild(d);
+    setTimeout(() => d.remove(), 800);
+  }
+  function tick(now) {
+    if (!holding || bloomed) return;
+    const dt = now - last; last = now;
+    progress = Math.min(1, progress + dt / 4200);
+    drawPlant(progress);
+    if (now - dropTimer > 70) { drop(); dropTimer = now; }
+    const step = Math.floor(progress * 8);
+    if (step > lastNote) { lastNote = step; chime([60 + [0, 2, 4, 7, 9, 12, 14, 16][step - 1]], 0, 0.07); }
+    if (progress >= 1) return bloom();
+    requestAnimationFrame(tick);
+  }
+  function bloom() {
+    bloomed = true; stopHold();
+    $('s-flower').classList.add('bloomed');
+    chime([72, 76, 79, 84, 88], 0.11, 0.16);
+    const g = garden.getBoundingClientRect();
+    for (let i = 0; i < 22; i++) {
+      const s = document.createElement('span');
+      s.className = 'spark';
+      s.textContent = ['✨', '💗', '✨', '🌸'][i % 4];
+      const a = Math.random() * Math.PI * 2, d = 50 + Math.random() * 90;
+      s.style.left = g.width / 2 + 'px'; s.style.top = '80px';
+      s.style.setProperty('--x', Math.cos(a) * d + 'px'); s.style.setProperty('--y', Math.sin(a) * d + 'px');
+      s.style.setProperty('--s', 12 + Math.random() * 14 + 'px');
+      garden.appendChild(s);
+      setTimeout(() => s.remove(), 1500);
+    }
+    $('flowerTitle').textContent = 'Look at that 🌷';
+    $('flowerLead').textContent = 'Thank you for reading this far. That alone means a lot.';
+    $('toChoice').classList.add('show');
+  }
+  hold.addEventListener('pointerdown', startHold);
+  ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => hold.addEventListener(ev, stopHold));
+  hold.addEventListener('contextmenu', e => e.preventDefault());
+  hold.addEventListener('keydown', e => { if ((e.key === ' ' || e.key === 'Enter') && !holding && !e.repeat) startHold(e); });
+  hold.addEventListener('keyup', e => { if (e.key === ' ' || e.key === 'Enter') stopHold(); });
+  $('toChoice').addEventListener('click', () => go('s-flower', 's-choice'));
+
+  /* 5 · her answer stays on her screen */
+  function petals(emoji, n) {
+    if (reduce) return;
+    for (let i = 0; i < n; i++) {
+      setTimeout(() => {
+        const p = document.createElement('span');
+        p.className = 'petal';
+        p.textContent = emoji[i % emoji.length];
+        p.style.left = Math.random() * 100 + 'vw';
+        p.style.fontSize = 14 + Math.random() * 16 + 'px';
+        p.style.animationDuration = 5 + Math.random() * 4 + 's';
+        p.style.setProperty('--sway', (Math.random() * 120 - 60) + 'px');
+        p.style.setProperty('--rot', (Math.random() * 540 - 270) + 'deg');
+        document.body.appendChild(p);
+        setTimeout(() => p.remove(), 9500);
+      }, i * 140);
+    }
+  }
+  document.querySelectorAll('[data-reply]').forEach(b => b.addEventListener('click', () => {
+    const k = b.dataset.reply;
+    if (k === 'reread') {
+      skip = false; typing = false;
+      $('skip').style.display = ''; $('toNotes').classList.remove('show');
+      go('s-choice', 's-letter'); setTimeout(typeLetter, 600);
+      return;
+    }
+    const [emoji, text] = REPLIES[k];
+    $('replyEmoji').textContent = emoji;
+    $('replyText').innerHTML = '';
+    text.split('\n').forEach(t => { const p = document.createElement('p'); p.textContent = t; $('replyText').appendChild(p); });
+    $('choiceAsk').style.display = 'none';
+    $('reply').classList.add('on');
+    if (k === 'forgive') { chime([72, 76, 79, 84], 0.14, 0.15); petals(['🌸', '🌷', '💗', '🤍'], 40); }
+    else if (k === 'time') { chime([69, 72, 76], 0.22, 0.1); petals(['✨', '⭐'], 18); }
+    else { chime([67, 72, 76], 0.15, 0.12); }
+  }));
+  $('back').addEventListener('click', () => {
+    $('reply').classList.remove('on');
+    $('choiceAsk').style.display = 'flex';
+  });
+})();
+</script>
+</body>
+</html>

@@ -155,6 +155,7 @@
   .rain{position:fixed;top:-40px;pointer-events:none;z-index:4;animation:fall linear forwards}
   @keyframes fall{to{transform:translateY(110vh) rotate(360deg)}}
 
+  .heads-up{margin-top:18px;font-size:.8rem;opacity:.55}
   .credit{position:fixed;left:10px;bottom:6px;z-index:1;font-size:10px;color:var(--ink);opacity:.4;text-decoration:none}
 
   /* music toggle */
@@ -210,6 +211,7 @@
         <button id="yes">Yes 💖</button>
         <button id="no">No</button>
       </div>
+      <p class="heads-up">🙈 heads up: I'll get a little notification of your answer</p>
     </section>
 
     <section class="success">
@@ -492,6 +494,7 @@
   }
   window.onYouTubeIframeAPIReady = () => {
     yt = new YT.Player('yt', {
+      host: 'https://www.youtube-nocookie.com',   // privacy-enhanced mode: no cookies until she plays
       width: '100%', height: '200', videoId: SONG_IDS[0],
       playerVars: { playsinline: 1, rel: 0, modestbranding: 1 },
       events: {
@@ -616,10 +619,7 @@
       yesHovers,
       lastNoText: tries ? noTexts[Math.min(tries, noTexts.length - 1)] : '',
       secondsOnPage: Math.round((Date.now() - t0) / 1000),
-      screen: `${screen.width}x${screen.height}`,
-      tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
-      localTime: new Date().toString(),
-      ua: navigator.userAgent
+      mobile: /iPhone|iPad|Android|Mobile/i.test(navigator.userAgent)
     });
     try { if (navigator.sendBeacon && navigator.sendBeacon('/api/report', body)) return; } catch (e) {}
     fetch('/api/report', { method: 'POST', body, keepalive: true }).catch(() => {});

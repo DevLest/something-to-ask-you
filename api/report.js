@@ -21,8 +21,7 @@ module.exports = async (req, res) => {
   if (!d || !EVENTS[d.event]) return res.status(400).end();
 
   const clean = v => String(v ?? '').slice(0, 300);
-  const ua = clean(d.ua);
-  const device = /iPhone|iPad|Android|Mobile/i.test(ua) ? 'Phone / tablet' : 'Computer';
+  const device = d.mobile ? 'Phone / tablet' : 'Computer';
   const noClicks = Math.max(0, d.noClicks | 0);
 
   const subject = d.event === 'opened'
@@ -42,10 +41,6 @@ module.exports = async (req, res) => {
     ['Name in link', clean(d.name) || '(none)'],
     ...clickRows,
     ['Device', device],
-    ['Screen size', clean(d.screen)],
-    ['Her time zone', clean(d.tz)],
-    ['Her local time', clean(d.localTime)],
-    ['Browser', ua],
     ['Visit ID', clean(d.sid)]
   ];
 
@@ -53,7 +48,8 @@ module.exports = async (req, res) => {
   console.log('report', JSON.stringify(Object.fromEntries(rows)));
 
   // ignore Vercel's own bots / per-deployment preview URLs so you only get emails from the real link
-  if (/HeadlessChrome|bot|crawler|spider|vercel/i.test(ua) || /-lesterbonbiono-\d+\.vercel\.app$/i.test(req.headers.host || '')) {
+  // (the user agent is only checked here, never stored or emailed)
+  if (/HeadlessChrome|bot|crawler|spider|vercel/i.test(req.headers['user-agent'] || '') || /-lesterbonbiono-\d+\.vercel\.app$/i.test(req.headers.host || '')) {
     return res.status(200).json({ ok: true, emailed: false, reason: 'ignored (bot or preview URL)' });
   }
 
