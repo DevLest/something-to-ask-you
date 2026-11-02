@@ -1,0 +1,647 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>A Question For You 💌</title>
+<meta name="description" content="I have something to ask you...">
+<meta property="og:title" content="I have a question for you 💌">
+<meta property="og:description" content="Open it, please 🥺">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💖</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --pink-1:#ffe3ec; --pink-2:#ffc2d6; --pink-3:#ff8fab; --pink-4:#fb6f92; --rose:#e63e6d;
+    --ink:#5a2a3a; --card:rgba(255,255,255,.78);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:'Fredoka',system-ui,sans-serif;color:var(--ink);
+    background:linear-gradient(160deg,var(--pink-1) 0%,var(--pink-2) 55%,#ffd6e7 100%);
+    min-height:100dvh;overflow:hidden;display:grid;place-items:center;
+    -webkit-tap-highlight-color:transparent;user-select:none;
+  }
+
+  /* floating background hearts */
+  .bg{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0}
+  .bg span{position:absolute;bottom:-60px;animation:rise linear infinite;opacity:.75}
+  @keyframes rise{
+    0%{transform:translateY(0) translateX(0) rotate(0)}
+    50%{transform:translateY(-55vh) translateX(25px) rotate(15deg)}
+    100%{transform:translateY(-115vh) translateX(-15px) rotate(-10deg);opacity:0}
+  }
+
+  .card{
+    position:relative;z-index:1;width:min(420px,calc(100vw - 32px));
+    background:var(--card);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+    border-radius:32px;padding:28px 24px 32px;text-align:center;
+    box-shadow:0 20px 50px rgba(230,62,109,.25),inset 0 0 0 2px rgba(255,255,255,.7);
+    animation:pop .7s cubic-bezier(.2,1.6,.4,1) both;
+  }
+  @keyframes pop{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
+
+  .bear-wrap{position:relative;width:190px;height:190px;margin:0 auto 6px}
+  .bear{width:100%;height:100%;animation:bob 2.4s ease-in-out infinite;transform-origin:50% 90%}
+  @keyframes bob{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-8px) rotate(3deg)}}
+  .bear .eye{animation:blink 4s infinite;transform-box:fill-box;transform-origin:center}
+  @keyframes blink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.1)}}
+  /* ---- bear moods: happy → surprised → worried → sad → crying → sobbing (+ hopeful on Yes hover) ---- */
+  .bear .brows,.bear .sweat,.bear .tear,.bear .streams,.bear .eyes-shut,.bear .sparkle{opacity:0;transition:opacity .3s}
+  .bear .eyes-open{transition:transform .3s cubic-bezier(.3,1.6,.5,1),opacity .2s;transform-box:fill-box;transform-origin:center}
+  .bear .ear{transition:transform .45s cubic-bezier(.3,1.6,.5,1);transform-box:fill-box}
+  .bear .ear.l{transform-origin:100% 100%}
+  .bear .ear.r{transform-origin:0 100%}
+  .bear .brows{transition:opacity .3s,d .3s}
+  .bear .mouth{transition:d .3s}
+  .bear .sparkle{transform-box:fill-box;transform-origin:center}
+  .bear:not([data-mood=happy]):not([data-mood=hopeful]) .brows{opacity:1}
+  .bear[data-mood=surprised] .eyes-open{transform:scale(1.25)}
+  .bear[data-mood=hopeful] .eyes-open{transform:scale(1.18)}
+  .bear[data-mood=hopeful] .sparkle{opacity:1;animation:twinkle .7s ease-in-out infinite}
+  .bear[data-mood=worried] .sweat,.bear[data-mood=sad] .sweat{opacity:1;animation:sweat 1.5s ease-in infinite}
+  .bear[data-mood=sad] .t1,.bear[data-mood=crying] .tear,.bear[data-mood=sobbing] .tear{opacity:1;animation:drip 1.1s ease-in infinite}
+  .bear[data-mood=crying] .t2,.bear[data-mood=sobbing] .t2{animation-delay:.55s}
+  .bear[data-mood=sobbing] .eyes-open{opacity:0}
+  .bear[data-mood=sobbing] .eyes-shut{opacity:1}
+  .bear[data-mood=sobbing] .streams{opacity:.85}
+  .bear[data-mood=sobbing] .streams path{stroke-dasharray:6 8;animation:flow .45s linear infinite}
+  .bear[data-mood=sad] .ear.l,.bear[data-mood=crying] .ear.l,.bear[data-mood=sobbing] .ear.l{transform:rotate(-30deg)}
+  .bear[data-mood=sad] .ear.r,.bear[data-mood=crying] .ear.r,.bear[data-mood=sobbing] .ear.r{transform:rotate(30deg)}
+  .bear[data-mood=surprised] .ear.l{transform:rotate(12deg)}
+  .bear[data-mood=surprised] .ear.r{transform:rotate(-12deg)}
+  .bear[data-mood=crying]{animation:sob .5s ease-in-out infinite}
+  .bear[data-mood=sobbing]{animation:sob .28s ease-in-out infinite}
+  .bear[data-mood=hopeful]{animation:hop .45s ease-in-out infinite}
+  @keyframes drip{0%{transform:translateY(0);opacity:1}100%{transform:translateY(28px);opacity:0}}
+  @keyframes sweat{0%{transform:translateY(0);opacity:1}100%{transform:translateY(16px);opacity:0}}
+  @keyframes twinkle{50%{transform:scale(.3) rotate(45deg)}}
+  @keyframes flow{to{stroke-dashoffset:-14}}
+  @keyframes sob{0%,100%{transform:translateX(-3px) rotate(-2deg)}50%{transform:translateX(3px) rotate(2deg)}}
+  @keyframes hop{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-14px) scale(1.04)}}
+
+  .bear-wrap.flinch{animation:flinch .55s}
+  @keyframes flinch{0%{transform:none}15%{transform:scale(1.15,.82)}35%{transform:scale(.9,1.12) rotate(-7deg)}55%{transform:rotate(6deg)}75%{transform:rotate(-3deg)}100%{transform:none}}
+
+  /* the heart next to the bear cracks, then falls */
+  .mini-heart .crack{opacity:0;transition:opacity .3s}
+  .bear-wrap[data-heart=cracked] #heartMain .crack,.bear-wrap[data-heart=broken] #heartMain .crack{opacity:1}
+  .bear-wrap[data-heart=cracked] #heartMain{animation:beat 2.4s ease-in-out infinite;filter:saturate(.45)}
+  .bear-wrap[data-heart=broken] #heartMain{animation:heartfall 1.3s ease-in forwards;filter:saturate(.3)}
+  @keyframes heartfall{0%{transform:none}30%{transform:rotate(-20deg) translateY(-8px)}100%{transform:rotate(50deg) translateY(190px);opacity:0}}
+
+  /* little effects */
+  .poof{position:fixed;pointer-events:none;z-index:6;font-size:var(--s,20px);animation:poof .8s ease-out forwards}
+  @keyframes poof{0%{transform:translate(-50%,-50%) scale(.3);opacity:1}100%{transform:translate(calc(-50% + var(--x)),calc(-50% + var(--y))) scale(1.2) rotate(var(--r,0deg));opacity:0}}
+  .card.shake{animation:shake .45s}
+  @keyframes shake{20%{transform:translateX(-9px) rotate(-1deg)}40%{transform:translateX(8px) rotate(1deg)}60%{transform:translateX(-5px)}80%{transform:translateX(3px)}}
+  .jelly{animation:jelly .55s}
+  @keyframes jelly{30%{transform:scale(1.12,.88)}50%{transform:scale(.94,1.06)}70%{transform:scale(1.04,.97)}100%{transform:none}}
+
+  .mini-heart{position:absolute;right:-6px;top:18px;width:46px;animation:beat 1s ease-in-out infinite}
+  .mini-heart.left{left:-4px;right:auto;top:auto;bottom:30px;width:30px;animation-delay:.3s}
+  @keyframes beat{0%,100%{transform:scale(1)}15%{transform:scale(1.25)}30%{transform:scale(1)}45%{transform:scale(1.15)}}
+
+  h1{font-size:clamp(1.6rem,6vw,2.1rem);font-weight:700;line-height:1.2;margin:4px 0 6px;color:var(--rose)}
+  .sub{font-size:1rem;opacity:.75;margin-bottom:22px;min-height:1.3em}
+
+  .buttons{display:flex;gap:14px;justify-content:center;align-items:center;min-height:64px;flex-wrap:wrap}
+  button{
+    font-family:inherit;font-weight:600;font-size:1.1rem;border:0;cursor:pointer;
+    padding:13px 30px;border-radius:999px;transition:transform .25s cubic-bezier(.3,1.6,.5,1),scale .4s cubic-bezier(.3,1.6,.5,1),box-shadow .2s;
+    touch-action:manipulation;
+  }
+  #yes{
+    background:linear-gradient(135deg,var(--pink-4),var(--rose));color:#fff;
+    box-shadow:0 8px 20px rgba(230,62,109,.4);z-index:2;position:relative;
+  }
+  #yes{animation:yesbeat 1.4s ease-in-out infinite}
+  #yes.nudge{animation:wiggle .5s, yesbeat 1.4s .5s ease-in-out infinite}
+  #yes:hover{box-shadow:0 10px 30px rgba(230,62,109,.65)}
+  @keyframes yesbeat{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+  @keyframes wiggle{20%{transform:rotate(-10deg) scale(1.1)}40%{transform:rotate(9deg) scale(1.1)}60%{transform:rotate(-6deg)}80%{transform:rotate(3deg)}}
+  #no{background:#fff;color:var(--ink);box-shadow:0 6px 16px rgba(90,42,58,.15);white-space:nowrap;z-index:3}
+  #no.free{position:fixed;font-family:'Fredoka',system-ui,sans-serif;transition:left .35s cubic-bezier(.3,1.4,.5,1),top .35s cubic-bezier(.3,1.4,.5,1),transform .2s}
+
+  /* success screen */
+  /* hidden without display:none so the YouTube player can load in the background */
+  .success{height:0;overflow:hidden;visibility:hidden}
+  .card.done .ask{display:none}
+  .card.done .success{height:auto;overflow:visible;visibility:visible;animation:pop .7s cubic-bezier(.2,1.6,.4,1) both}
+  .now-playing{margin:18px auto 0;width:100%;max-width:356px;height:200px;border-radius:18px;overflow:hidden;
+    background:#2b1020;box-shadow:0 10px 26px rgba(230,62,109,.35),0 0 0 3px #fff}
+  .now-playing iframe{display:block;width:100%;height:200px;border:0}
+  .song{margin-top:10px;font-size:.95rem;font-weight:600;color:var(--rose)}
+  .song span{display:inline-block;animation:groove .9s ease-in-out infinite}
+  .couple{display:flex;justify-content:center;align-items:flex-end;gap:0;height:170px;margin-bottom:8px;position:relative}
+  .couple svg.b{width:130px;height:130px}
+  .couple .b1{animation:lean1 1.6s ease-in-out infinite;transform-origin:50% 100%}
+  .couple .b2{animation:lean2 1.6s ease-in-out infinite;transform-origin:50% 100%}
+  @keyframes lean1{0%,100%{transform:rotate(6deg) translateX(10px)}50%{transform:rotate(12deg) translateX(16px) translateY(-6px)}}
+  @keyframes lean2{0%,100%{transform:rotate(-6deg) translateX(-10px) scaleX(-1)}50%{transform:rotate(-12deg) translateX(-16px) translateY(-6px) scaleX(-1)}}
+  .couple .big-heart{position:absolute;top:0;left:50%;width:56px;margin-left:-28px;animation:beat 1s ease-in-out infinite}
+  .success h1{font-size:clamp(1.8rem,7vw,2.4rem)}
+  .success p{font-size:1.1rem;margin-top:8px}
+
+  /* heart burst */
+  .burst{position:fixed;left:50%;top:50%;pointer-events:none;z-index:5;font-size:var(--s);
+    animation:fly 1.6s cubic-bezier(.1,.8,.3,1) forwards}
+  @keyframes fly{
+    0%{transform:translate(-50%,-50%) scale(.2);opacity:1}
+    80%{opacity:1}
+    100%{transform:translate(calc(-50% + var(--x)),calc(-50% + var(--y))) scale(1) rotate(var(--r));opacity:0}
+  }
+  .rain{position:fixed;top:-40px;pointer-events:none;z-index:4;animation:fall linear forwards}
+  @keyframes fall{to{transform:translateY(110vh) rotate(360deg)}}
+
+  .credit{position:fixed;left:10px;bottom:6px;z-index:1;font-size:10px;color:var(--ink);opacity:.4;text-decoration:none}
+
+  /* music toggle */
+  #mute{
+    position:fixed;right:16px;bottom:16px;z-index:7;width:52px;height:52px;padding:0;border-radius:50%;
+    background:#fff;font-size:1.4rem;box-shadow:0 6px 18px rgba(230,62,109,.3);display:none;
+    animation:pop .5s cubic-bezier(.2,1.6,.4,1) both;
+  }
+  #mute.show{display:grid;place-items:center}
+  #mute.playing{animation:pop .5s cubic-bezier(.2,1.6,.4,1) both, groove .9s ease-in-out .5s infinite}
+  @keyframes groove{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(8deg) scale(1.06)}}
+
+  @media (prefers-reduced-motion:reduce){
+    .bear,.mini-heart,.couple *{animation:none!important}
+  }
+</style>
+</head>
+<body>
+  <div class="bg" id="bg"></div>
+
+  <main class="card" id="card">
+    <section class="ask">
+      <div class="bear-wrap">
+        <svg class="bear" id="bear" data-mood="happy" viewBox="0 0 200 200" aria-hidden="true">
+          <g class="ear l"><circle cx="52" cy="52" r="24" fill="#c98b5e"/><circle cx="52" cy="52" r="13" fill="#f2c4a0"/></g>
+          <g class="ear r"><circle cx="148" cy="52" r="24" fill="#c98b5e"/><circle cx="148" cy="52" r="13" fill="#f2c4a0"/></g>
+          <circle cx="100" cy="105" r="72" fill="#d9a073"/>
+          <ellipse cx="100" cy="130" rx="34" ry="26" fill="#f5d6b8"/>
+          <path class="brows" id="brows" d="M60 72 Q72 62 84 72 M116 72 Q128 62 140 72" stroke="#3a2318" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+          <g class="eyes-open">
+            <ellipse class="eye" cx="72" cy="95" rx="8" ry="9" fill="#3a2318"/>
+            <ellipse class="eye" cx="128" cy="95" rx="8" ry="9" fill="#3a2318"/>
+            <circle cx="75" cy="91" r="3" fill="#fff"/><circle cx="131" cy="91" r="3" fill="#fff"/>
+          </g>
+          <path class="sparkle" d="M78 82 L79.5 86.5 L84 88 L79.5 89.5 L78 94 L76.5 89.5 L72 88 L76.5 86.5Z" fill="#fff"/>
+          <path class="sparkle" d="M134 82 L135.5 86.5 L140 88 L135.5 89.5 L134 94 L132.5 89.5 L128 88 L132.5 86.5Z" fill="#fff"/>
+          <path class="eyes-shut" d="M62 89 L80 96 L62 103 M138 89 L120 96 L138 103" stroke="#3a2318" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          <ellipse cx="56" cy="120" rx="12" ry="7" fill="#ff8fab" opacity=".65"/>
+          <ellipse cx="144" cy="120" rx="12" ry="7" fill="#ff8fab" opacity=".65"/>
+          <ellipse cx="100" cy="117" rx="10" ry="7" fill="#4a2c20"/>
+          <path class="mouth" id="mouth" d="M86 132 Q100 146 114 132" stroke="#4a2c20" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          <g class="streams"><path d="M68 103 Q64 135 62 172" stroke="#7cc6ff" stroke-width="7" fill="none" stroke-linecap="round"/><path d="M132 103 Q136 135 138 172" stroke="#7cc6ff" stroke-width="7" fill="none" stroke-linecap="round"/></g>
+          <ellipse class="tear t1" cx="68" cy="108" rx="4.5" ry="6.5" fill="#7cc6ff"/>
+          <ellipse class="tear t2" cx="132" cy="108" rx="4.5" ry="6.5" fill="#7cc6ff"/>
+          <path class="sweat" d="M160 60 Q167 72 160 77 Q153 72 160 60Z" fill="#9ad8ff"/>
+        </svg>
+        <svg class="mini-heart" id="heartMain" viewBox="0 0 24 24"><path fill="#fb6f92" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/><path class="crack" d="M12 5.2 L10.2 9 L13.2 12 L10.6 15.8 L12 20.5" stroke="#fff" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>
+        <svg class="mini-heart left" viewBox="0 0 24 24"><path fill="#ff8fab" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+      </div>
+      <h1 id="question">Do you love me? 🥺</h1>
+      <p class="sub" id="sub">Be honest… (but choose wisely)</p>
+      <div class="buttons">
+        <button id="yes">Yes 💖</button>
+        <button id="no">No</button>
+      </div>
+    </section>
+
+    <section class="success">
+      <div class="couple">
+        <svg class="big-heart" viewBox="0 0 24 24"><path fill="#e63e6d" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+        <svg class="b b1" viewBox="0 0 200 200"><use href="#happyBear"/></svg>
+        <svg class="b b2" viewBox="0 0 200 200"><use href="#happyBear2"/></svg>
+      </div>
+      <h1>Yaaay!! 💕</h1>
+      <p id="successMsg">I knew it! I love you too 🥰</p>
+      <div class="now-playing"><div id="yt"></div></div>
+      <p class="song"><span>🎵</span> Panaginip — nicole</p>
+    </section>
+  </main>
+
+  <button id="mute" aria-label="Mute music">🔊</button>
+  <a class="credit" href="https://budgetpixel.com/sfx/near-miss-crowd-aww-25a5e7ed" target="_blank" rel="noopener">"Near Miss Crowd Aww" by BudgetPixel AI · CC BY 4.0</a>
+
+  <!-- reusable bears for the success screen -->
+  <svg width="0" height="0" style="position:absolute">
+    <defs>
+      <g id="happyBear">
+        <circle cx="52" cy="52" r="24" fill="#c98b5e"/><circle cx="52" cy="52" r="13" fill="#f2c4a0"/>
+        <circle cx="148" cy="52" r="24" fill="#c98b5e"/><circle cx="148" cy="52" r="13" fill="#f2c4a0"/>
+        <circle cx="100" cy="105" r="72" fill="#d9a073"/>
+        <ellipse cx="100" cy="130" rx="34" ry="26" fill="#f5d6b8"/>
+        <path d="M62 96 Q72 84 82 96 M118 96 Q128 84 138 96" stroke="#3a2318" stroke-width="5" fill="none" stroke-linecap="round"/>
+        <ellipse cx="56" cy="118" rx="13" ry="8" fill="#ff6f91" opacity=".75"/>
+        <ellipse cx="144" cy="118" rx="13" ry="8" fill="#ff6f91" opacity=".75"/>
+        <ellipse cx="100" cy="117" rx="10" ry="7" fill="#4a2c20"/>
+        <path d="M84 130 Q100 152 116 130 Z" fill="#a8324f"/>
+      </g>
+      <g id="happyBear2">
+        <circle cx="52" cy="52" r="24" fill="#f4e1d2"/><circle cx="52" cy="52" r="13" fill="#ffc2d6"/>
+        <circle cx="148" cy="52" r="24" fill="#f4e1d2"/><circle cx="148" cy="52" r="13" fill="#ffc2d6"/>
+        <circle cx="100" cy="105" r="72" fill="#fdf1e8"/>
+        <ellipse cx="100" cy="130" rx="34" ry="26" fill="#fff"/>
+        <path d="M62 96 Q72 84 82 96 M118 96 Q128 84 138 96" stroke="#3a2318" stroke-width="5" fill="none" stroke-linecap="round"/>
+        <ellipse cx="56" cy="118" rx="13" ry="8" fill="#ff6f91" opacity=".75"/>
+        <ellipse cx="144" cy="118" rx="13" ry="8" fill="#ff6f91" opacity=".75"/>
+        <ellipse cx="100" cy="117" rx="10" ry="7" fill="#4a2c20"/>
+        <path d="M84 130 Q100 152 116 130 Z" fill="#a8324f"/>
+        <path transform="translate(132 30) scale(1.6)" fill="#fb6f92" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+      </g>
+    </defs>
+  </svg>
+
+<script>
+(() => {
+  // Personalize with ?name=Her+Name  (e.g. yoursite.vercel.app/?name=Anna)
+  const params = new URLSearchParams(location.search);
+  const name = (params.get('name') || '').trim().slice(0, 30);
+  if (name) document.getElementById('question').textContent = `${name}, do you love me? 🥺`;
+
+  // Floating background hearts
+  const bg = document.getElementById('bg');
+  const emojis = ['💖','💕','💗','💓','🌸','💞','✨'];
+  for (let i = 0; i < 22; i++) {
+    const s = document.createElement('span');
+    s.textContent = emojis[i % emojis.length];
+    s.style.left = Math.random() * 100 + 'vw';
+    s.style.fontSize = 14 + Math.random() * 26 + 'px';
+    s.style.animationDuration = 8 + Math.random() * 10 + 's';
+    s.style.animationDelay = -Math.random() * 18 + 's';
+    bg.appendChild(s);
+  }
+
+  const yes = document.getElementById('yes');
+  const no = document.getElementById('no');
+  const bear = document.getElementById('bear');
+  const mouth = document.getElementById('mouth');
+  const sub = document.getElementById('sub');
+  const card = document.getElementById('card');
+
+  const noTexts = ['No','Are you sure?','Really sure? 🤨','Think again!','Pleeease 🥺','Don\'t do this…','You\'re breaking my heart 💔','I\'ll cry 😭','Last chance!','Ok you can\'t catch me 😜'];
+  const subs = ['Be honest… (but choose wisely)','Hmm, wrong button I think 👀','The pink one is right there…','My heart is getting nervous 💓','Why are you like this 😤','Just press Yes 🥹','The Yes button is getting bigger for a reason…'];
+  const wrap = document.querySelector('.bear-wrap');
+  const brows = document.getElementById('brows');
+  const question = document.getElementById('question');
+
+  // the bear gets more upset with every "No"
+  const moods = ['happy', 'surprised', 'worried', 'sad', 'crying', 'sobbing'];
+  const moodEmoji = ['', '😮', '😰', '😢', '😭', '💔'];
+  const mouthD = {
+    happy:     'M86 132 Q100 146 114 132',
+    hopeful:   'M84 130 Q100 154 116 130 Z',
+    surprised: 'M93 136 Q93 126 100 126 Q107 126 107 136 Q107 146 100 146 Q93 146 93 136 Z',
+    worried:   'M86 138 Q93 132 100 138 Q107 144 114 138',
+    sad:       'M86 142 Q100 129 114 142',
+    crying:    'M86 145 Q100 125 114 145 Z',
+    sobbing:   'M82 150 Q100 118 118 150 Z'
+  };
+  const filledMouth = new Set(['hopeful', 'surprised', 'crying', 'sobbing']);
+  const browD = {
+    up:    'M60 72 Q72 62 84 72 M116 72 Q128 62 140 72',
+    sad:   'M60 79 L84 70 M140 79 L116 70',
+    upset: 'M60 81 L84 65 M140 81 L116 65'
+  };
+  const moodBrows = { happy: 'up', hopeful: 'up', surprised: 'up', worried: 'sad', sad: 'sad', crying: 'upset', sobbing: 'upset' };
+
+  let tries = 0;
+  const currentMood = () => moods[Math.min(tries, moods.length - 1)];
+
+  function setMood(m) {
+    bear.dataset.mood = m;
+    mouth.setAttribute('d', mouthD[m]);
+    mouth.setAttribute('fill', filledMouth.has(m) ? '#a8324f' : 'none');
+    brows.setAttribute('d', browD[moodBrows[m]]);
+  }
+
+  function replay(el, cls) { el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); }
+
+  function poof(x, y, items, count, spread) {
+    for (let i = 0; i < count; i++) {
+      const s = document.createElement('span');
+      s.className = 'poof';
+      s.textContent = items[i % items.length];
+      const a = Math.random() * Math.PI * 2, d = spread * (0.5 + Math.random() * 0.7);
+      s.style.left = x + 'px'; s.style.top = y + 'px';
+      s.style.setProperty('--x', Math.cos(a) * d + 'px');
+      s.style.setProperty('--y', Math.sin(a) * d + 'px');
+      s.style.setProperty('--r', (Math.random() * 120 - 60) + 'deg');
+      s.style.setProperty('--s', 14 + Math.random() * 14 + 'px');
+      document.body.appendChild(s);
+      setTimeout(() => s.remove(), 850);
+    }
+  }
+
+  // Yes hover: the bear gets hopeful
+  let yesHovers = 0;
+  yes.addEventListener('pointerenter', () => { if (!card.classList.contains('done')) { yesHovers++; setMood('hopeful'); } });
+  yes.addEventListener('pointerleave', () => { if (!card.classList.contains('done')) setMood(currentMood()); });
+
+  function dodge(e) {
+    if (e) { e.preventDefault(); e.stopPropagation(); }
+    tries++;
+
+    // puff of smoke where the No button was
+    const old = no.getBoundingClientRect();
+    poof(old.left + old.width / 2, old.top + old.height / 2, ['💨', '✨', '💨'], 8, 60);
+
+    no.textContent = noTexts[Math.min(tries, noTexts.length - 1)];
+    sub.textContent = subs[Math.min(tries, subs.length - 1)];
+    replay(question, 'jelly');
+    replay(sub, 'jelly');
+
+    // Yes grows and wiggles for attention
+    yes.style.scale = Math.min(1 + tries * 0.12, 2);
+    replay(yes, 'nudge');
+
+    // bear reacts
+    setMood(currentMood());
+    replay(wrap, 'flinch');
+    replay(card, 'shake');
+    wrap.dataset.heart = tries >= 5 ? 'broken' : tries >= 3 ? 'cracked' : '';
+    const b = wrap.getBoundingClientRect();
+    const em = moodEmoji[Math.min(tries, moodEmoji.length - 1)];
+    if (em) poof(b.left + b.width * 0.85, b.top + b.height * 0.2, [em], 1, 50);
+    if (navigator.vibrate) navigator.vibrate(30);
+    uhh(tries);
+
+    // first time: lift the button out of the card (the card's blur/transform would
+    // otherwise trap position:fixed and send it off-screen) so it can roam the screen
+    const r = no.getBoundingClientRect();
+    if (!no.classList.contains('free')) {
+      // keep a same-size gap so the Yes button doesn't jump
+      const gap = document.createElement('span');
+      gap.style.cssText = `display:inline-block;width:${r.width}px;height:${r.height}px`;
+      no.after(gap);
+      document.body.appendChild(no);
+      no.style.left = r.left + 'px';
+      no.style.top = r.top + 'px';
+      no.classList.add('free');
+      no.offsetWidth; // force reflow so the move animates
+    }
+
+    const pad = 16;
+    const w = no.offsetWidth, h = no.offsetHeight;
+    const maxX = window.innerWidth - w - pad;
+    const maxY = window.innerHeight - h - pad;
+    const y = yes.getBoundingClientRect();
+    let x, top, tries2 = 0;
+    do {
+      x = pad + Math.random() * Math.max(0, maxX - pad);
+      top = pad + Math.random() * Math.max(0, maxY - pad);
+      tries2++;
+    } while (tries2 < 25 && (
+      // avoid landing on the Yes button or right where the pointer is
+      (x < y.right + 10 && x + w > y.left - 10 && top < y.bottom + 10 && top + h > y.top - 10) ||
+      (Math.abs(x - r.left) < w && Math.abs(top - r.top) < h * 2)
+    ));
+    no.style.left = x + 'px';
+    no.style.top = top + 'px';
+    no.style.transform = `rotate(${(Math.random() * 20 - 10).toFixed(1)}deg)`;
+    // squash-and-pop as it lands
+    if (no.animate) no.animate([{ scale: '0.4' }, { scale: '1.2', offset: 0.6 }, { scale: '1' }], { duration: 450, easing: 'ease-out' });
+  }
+
+  // moves when she clicks / taps it (pointerdown covers mouse + touch)
+  no.addEventListener('pointerdown', dodge);
+  no.addEventListener('click', e => e.preventDefault());
+  no.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') dodge(e); });
+
+  function burst() {
+    const set = ['💖','💕','💗','💘','💝','🌸','✨','🥰'];
+    for (let i = 0; i < 70; i++) {
+      const s = document.createElement('span');
+      s.className = 'burst';
+      s.textContent = set[i % set.length];
+      const ang = Math.random() * Math.PI * 2;
+      const dist = 120 + Math.random() * Math.max(window.innerWidth, window.innerHeight) * 0.5;
+      s.style.setProperty('--x', Math.cos(ang) * dist + 'px');
+      s.style.setProperty('--y', Math.sin(ang) * dist + 'px');
+      s.style.setProperty('--r', (Math.random() * 360 - 180) + 'deg');
+      s.style.setProperty('--s', 16 + Math.random() * 28 + 'px');
+      document.body.appendChild(s);
+      setTimeout(() => s.remove(), 1700);
+    }
+  }
+  function rain() {
+    let n = 0;
+    const id = setInterval(() => {
+      const s = document.createElement('span');
+      s.className = 'rain';
+      s.textContent = ['💖','🎵','💕','🌸','🎶','💗'][n % 6];
+      s.style.left = Math.random() * 100 + 'vw';
+      s.style.fontSize = 18 + Math.random() * 22 + 'px';
+      s.style.animationDuration = 3 + Math.random() * 3 + 's';
+      document.body.appendChild(s);
+      setTimeout(() => s.remove(), 6500);
+      if (++n > 120) clearInterval(id);
+    }, 90);
+  }
+
+  /* ---------- disappointed crowd "awww" on every No ---------- */
+  let sfxCtx = null;
+  function getSfx() {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return null;
+    if (!sfxCtx) sfxCtx = new AC();
+    if (sfxCtx.state === 'suspended') sfxCtx.resume();
+    return sfxCtx;
+  }
+  // iPhones only unlock audio on touchend/click, so unlock on any tap
+  ['touchend', 'pointerup', 'click'].forEach(ev => document.addEventListener(ev, getSfx, { passive: true }));
+
+  // Sound: "Near Miss Crowd Aww" by BudgetPixel AI
+  // https://budgetpixel.com/sfx/near-miss-crowd-aww-25a5e7ed — CC BY 4.0
+  const awwFile = fetch('aww.mp3').then(r => r.arrayBuffer()).catch(() => null);
+  let awwBuffer = null, awwLast = null;
+  async function loadAww(ctx) {
+    if (awwBuffer) return awwBuffer;
+    const data = await awwFile;
+    if (!data) return null;
+    awwBuffer = await new Promise((ok, fail) => ctx.decodeAudioData(data.slice(0), ok, fail)).catch(() => null);
+    return awwBuffer;
+  }
+  async function uhh(level) {
+    const ctx = getSfx();
+    if (!ctx) { try { new Audio('aww.mp3').play(); } catch (e) {} return; }
+    const buf = await loadAww(ctx);
+    if (!buf) return;
+    if (awwLast) try { awwLast.stop(); } catch (e) {}       // don't pile up on fast clicks
+    const src = ctx.createBufferSource(), gain = ctx.createGain();
+    src.buffer = buf;
+    src.playbackRate.value = 1 - Math.min(level - 1, 5) * 0.035;   // a bit lower & sadder each time
+    gain.gain.value = 0.9;
+    src.connect(gain); gain.connect(ctx.destination);
+    src.start();
+    awwLast = src;
+  }
+
+  /* ---------- background music: "Panaginip" by nicole via the official YouTube embed ----------
+     Falls back to the official lyric video, then to an original music-box tune. */
+  const SONG_IDS = ['HoU1k2oW3W4', 'mJmA9fI7Fj8'];   // official MV, official lyric video (nicole's channel)
+  let yt = null, ytReady = false, ytFailed = false, wantPlay = false, songIdx = 0, box = null, musicCtx = null;
+
+  function hideYT() {
+    document.querySelectorAll('.now-playing, .song').forEach(n => n.remove());
+  }
+  window.onYouTubeIframeAPIReady = () => {
+    yt = new YT.Player('yt', {
+      width: '100%', height: '200', videoId: SONG_IDS[0],
+      playerVars: { playsinline: 1, rel: 0, modestbranding: 1 },
+      events: {
+        onReady: () => { ytReady = true; if (wantPlay) yt.playVideo(); },
+        onError: () => {
+          songIdx++;
+          if (songIdx < SONG_IDS.length) {
+            wantPlay ? yt.loadVideoById(SONG_IDS[songIdx]) : yt.cueVideoById(SONG_IDS[songIdx]);
+          } else {
+            ytFailed = true;
+            if (wantPlay) startMusicBox(); else hideYT();
+          }
+        },
+        onStateChange: e => { if (e.data === YT.PlayerState.ENDED) { yt.seekTo(0); yt.playVideo(); } }  // loop
+      }
+    });
+  };
+  const ytTag = document.createElement('script');
+  ytTag.src = 'https://www.youtube.com/iframe_api';
+  ytTag.onerror = () => { ytFailed = true; hideYT(); };
+  document.head.appendChild(ytTag);
+  function musicBox(ctx) {
+    const master = ctx.createGain();
+    master.gain.setValueAtTime(0, ctx.currentTime);
+    master.gain.linearRampToValueAtTime(0.32, ctx.currentTime + 1.2); // gentle fade-in
+    master.connect(ctx.destination);
+    const bus = ctx.createGain();
+    bus.connect(master);
+    // soft echo for a dreamy music-box feel
+    const delay = ctx.createDelay(), fb = ctx.createGain(), wet = ctx.createGain();
+    delay.delayTime.value = 0.29; fb.gain.value = 0.28; wet.gain.value = 0.32;
+    bus.connect(delay); delay.connect(fb); fb.connect(delay); delay.connect(wet); wet.connect(master);
+
+    function note(midi, t, dur, vol) {
+      const f = 440 * Math.pow(2, (midi - 69) / 12);
+      const o = ctx.createOscillator(), bell = ctx.createOscillator();
+      const g = ctx.createGain(), bg = ctx.createGain();
+      o.type = 'sine'; o.frequency.value = f;
+      bell.type = 'sine'; bell.frequency.value = f * 4; bg.gain.value = 0.12;
+      o.connect(g); bell.connect(bg); bg.connect(g); g.connect(bus);
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(vol, t + 0.012);
+      g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+      o.start(t); bell.start(t); o.stop(t + dur + 0.05); bell.stop(t + dur + 0.05);
+    }
+
+    // [midi note, length in beats] — 8 bars of 4 beats
+    const melody = [
+      [76,1],[79,1],[84,1],[83,1],  [81,1],[79,1],[76,2],
+      [77,1],[81,1],[86,1],[84,1],  [83,1],[79,3],
+      [76,1],[79,1],[84,1],[88,1],  [86,1],[84,1],[81,2],
+      [77,1],[76,1],[74,1],[79,1],  [72,4]
+    ];
+    const chords = [[48,55,60,55],[45,52,57,52],[41,48,53,48],[43,50,55,50],
+                    [48,55,60,55],[45,52,57,52],[50,57,43,50],[48,55,60,64]];
+    const beat = 60 / 100;
+    const loopBeats = 32;
+    let timer;
+
+    function scheduleLoop(start) {
+      let b = 0;
+      for (const [m, len] of melody) { note(m, start + b * beat, Math.max(1.4, len * beat * 1.6), 0.5); b += len; }
+      chords.forEach((c, bar) => c.forEach((m, i) => note(m, start + (bar * 4 + i) * beat, 1.2, 0.18)));
+      const next = start + loopBeats * beat;
+      timer = setTimeout(() => scheduleLoop(next), Math.max(0, (next - ctx.currentTime - 0.6) * 1000));
+    }
+    return {
+      start() { scheduleLoop(ctx.currentTime + 0.1); },
+      pause() { ctx.suspend(); },
+      play() { ctx.resume(); }
+    };
+  }
+
+  const muteBtn = document.getElementById('mute');
+  let music = null, muted = false;
+
+  function startMusicBox() {
+    if (box || !musicCtx) return;
+    hideYT();
+    if (yt && yt.stopVideo) try { yt.stopVideo(); } catch (e) {}
+    box = musicBox(musicCtx);
+    box.start();
+    music = box;
+  }
+
+  function startMusic() {
+    // create the fallback audio context inside the click so phones allow sound
+    const AC = window.AudioContext || window.webkitAudioContext;
+    musicCtx = AC ? new AC() : null;
+    if (musicCtx && musicCtx.state === 'suspended') musicCtx.resume();
+
+    wantPlay = true;
+    music = { pause: () => yt && yt.pauseVideo(), play: () => yt && yt.playVideo() };
+    if (ytFailed) startMusicBox();
+    else if (ytReady) yt.playVideo();
+    else setTimeout(() => { if (!ytReady) startMusicBox(); }, 6000);  // YouTube never loaded
+
+    muteBtn.classList.add('show', 'playing');
+  }
+
+  muteBtn.addEventListener('click', () => {
+    if (!music) return;
+    muted = !muted;
+    muted ? music.pause() : music.play();
+    muteBtn.textContent = muted ? '🔇' : '🔊';
+    muteBtn.setAttribute('aria-label', muted ? 'Play music' : 'Mute music');
+    muteBtn.classList.toggle('playing', !muted);
+  });
+
+  /* ---------- analytics: emails you when she opens it, says yes, or leaves ----------
+     Add ?preview to the link to test without sending reports. */
+  const sid = Math.random().toString(36).slice(2, 10);
+  const t0 = Date.now();
+  const sent = {};
+  const silent = params.has('preview') || location.protocol === 'file:' || /^(localhost|127\.)/.test(location.hostname);
+  function report(event) {
+    if (silent || sent[event]) return;
+    sent[event] = true;
+    const body = JSON.stringify({
+      sid, event, name,
+      noClicks: tries,
+      yesHovers,
+      lastNoText: tries ? noTexts[Math.min(tries, noTexts.length - 1)] : '',
+      secondsOnPage: Math.round((Date.now() - t0) / 1000),
+      screen: `${screen.width}x${screen.height}`,
+      tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      localTime: new Date().toString(),
+      ua: navigator.userAgent
+    });
+    try { if (navigator.sendBeacon && navigator.sendBeacon('/api/report', body)) return; } catch (e) {}
+    fetch('/api/report', { method: 'POST', body, keepalive: true }).catch(() => {});
+  }
+  report('opened');
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden' && !sent.said_yes) report('left');
+  });
+
+  yes.addEventListener('click', () => {
+    report('said_yes');
+    startMusic();
+    no.remove();
+    card.classList.add('done');
+    if (name) document.getElementById('successMsg').textContent = `I knew it, ${name}! I love you too 🥰`;
+    if (tries > 3) document.getElementById('successMsg').textContent += ' (took you long enough 😤💕)';
+    burst();
+    setTimeout(burst, 500);
+    rain();
+    if (navigator.vibrate) navigator.vibrate([60, 40, 60]);
+  });
+})();
+</script>
+</body>
+</html>
